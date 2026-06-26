@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قرعة الجمعية - سحب فردي ومراكز ثابتة</title>
+    <title>قرعة الجمعية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -110,8 +110,8 @@
     <div class="app-container">
         <div id="createView">
             <i class="fa-solid fa-layer-group icon-header"></i>
-            <h1>تأسيس جمعية جديدة</h1>
-            <p class="subtitle">حدد الإجمالي أولاً، ثم ثبت المراكز المطلوبة إن وجدت</p>
+            <h1>عمل جمعية جديدة</h1>
+            <p class="subtitle">عدد الأفراد</p>
             
             <input type="number" id="slotsCount" placeholder="العدد الإجمالي للمشتركين (مثال: 10)" min="2" max="50" oninput="showPreAssignBox()">
             
@@ -119,7 +119,7 @@
                 <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--accent-color);"><i class="fa-solid fa-thumbtack"></i> حجز مراكز ثابتة مسبقاً</h3>
                 <div class="pre-assign-inputs">
                     <input type="number" id="fixedNum" placeholder="المركز" style="width: 30%;">
-                    <input type="text" id="fixedName" placeholder="اسم الشخص (مثال: عاصم)" style="width: 70%;">
+                    <input type="text" id="fixedName" placeholder="اسم الشخص" style="width: 70%;">
                 </div>
                 <button class="btn-secondary" onclick="addFixedSlot()">
                     <i class="fa-solid fa-plus"></i> تثبيت المركز
@@ -128,7 +128,7 @@
             </div>
 
             <button onclick="createRoom()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة وبدء السحب
+                <i class="fa-solid fa-wand-magic-sparkles"></i> عمل الجمعية
             </button>
         </div>
 
@@ -139,10 +139,10 @@
 
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('drawTab')">
-                    <i class="fa-solid fa-hand-pointer"></i> سحب دوري
+                    <i class="fa-solid fa-hand-pointer"></i>  القرعة
                 </button>
                 <button class="tab-btn" onclick="switchTab('boardTab')">
-                    <i class="fa-solid fa-list-ol"></i> لوحة الترتيب
+                    <i class="fa-solid fa-list-ol"></i>  القائمة
                 </button>
             </div>
 
@@ -154,7 +154,7 @@
                 <div id="drawActionArea">
                     <input type="text" id="playerName" placeholder="اكتب اسمك الثلاثي هنا...">
                     <button id="drawBtn" onclick="drawMySlot()">
-                        <i class="fa-solid fa-shuffle"></i> اسحب ورقتي العشوائية
+                        <i class="fa-solid fa-shuffle"></i> شد ورقة
                     </button>
                 </div>
 
@@ -258,7 +258,7 @@
             if (!count || count < 2) { alert('أدخل رقماً إجمالياً صحيحاً (أكبر من 1)'); return; }
 
             const btn = document.querySelector('#createView button:last-child');
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تأسيس الغرفة...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تأسيس الجمعية...`;
             btn.disabled = true;
 
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -282,7 +282,7 @@
                 window.location.search = `?room=${randomId}`;
             } catch (error) {
                 alert("حدث خطأ! يرجى المحاولة مرة أخرى.");
-                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة وبدء السحب`;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الجمعية وبدء القرعة`;
                 btn.disabled = false;
             }
         };
@@ -356,7 +356,7 @@
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري سحب ورقتك السحابية...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري شد ورقتك السحابية...`;
 
             const roomRef = doc(db, "rooms", roomId);
 
@@ -369,7 +369,7 @@
                     let currentDevices = data.drawnDevices || [];
 
                     if (currentAvailable.length === 0) throw "لا توجد خانات فارغة للسحب!";
-                    if (currentDevices.includes(myDeviceId)) throw "لقد قمت بالسحب مسبقاً!";
+                    if (currentDevices.includes(myDeviceId)) throw "لقد قمت بالشد مسبقاً!";
 
                     const randomIndex = Math.floor(Math.random() * currentAvailable.length);
                     const selectedSlot = currentAvailable[randomIndex];
@@ -391,7 +391,7 @@
                 console.error("خطأ:", error);
                 alert(typeof error === 'string' ? error : "حدث خطأ، يرجى المحاولة مرة أخرى.");
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-shuffle"></i> اسحب ورقتي العشوائية`;
+                btn.innerHTML = `<i class="fa-solid fa-shuffle"></i> شد القرعة عشوائيا`;
             }
         };
 
