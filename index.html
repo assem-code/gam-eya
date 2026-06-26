@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قرعة الجمعية - سحب فردي</title>
+    <title>قرعة الجمعية - سحب فردي ومراكز ثابتة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* تصميم Noir و Smart */
         :root {
             --bg-color: #0b0f19;
             --card-bg: #151b2b;
@@ -18,6 +17,7 @@
             --text-main: #f8fafc;
             --text-muted: #64748b;
             --border-color: #1e293b;
+            --danger: #ff5252;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
@@ -27,7 +27,7 @@
         }
 
         .app-container {
-            width: 100%; max-width: 500px; background-color: var(--card-bg);
+            width: 100%; max-width: 550px; background-color: var(--card-bg);
             border-radius: 24px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             border: 1px solid var(--border-color);
         }
@@ -35,11 +35,11 @@
         #createView { text-align: center; }
         .icon-header { font-size: 50px; color: var(--accent-color); margin-bottom: 20px; }
         h1 { font-size: 24px; margin-bottom: 10px; }
-        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
 
         input[type="number"], input[type="text"] {
             width: 100%; background: #0f172a; border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 15px; color: #fff; font-size: 16px; margin-bottom: 20px; text-align: center;
+            border-radius: 12px; padding: 15px; color: #fff; font-size: 16px; margin-bottom: 15px; text-align: center;
         }
         input:focus { outline: none; border-color: var(--accent-color); }
 
@@ -50,6 +50,22 @@
         }
         button:active { transform: scale(0.97); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-secondary { background-color: #1e293b; color: var(--text-main); border: 1px solid var(--border-color); padding: 10px;}
+        
+        /* قسم حجز المراكز */
+        .pre-assign-box {
+            background: #0f172a; padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);
+            margin-bottom: 20px; text-align: right; display: none;
+        }
+        .pre-assign-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
+        .pre-assign-inputs input { margin-bottom: 0; padding: 10px; font-size: 14px;}
+        
+        .fixed-list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card-bg); padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border-color);
+        }
+        .btn-delete-fixed { background: none; color: var(--danger); padding: 5px; width: auto; font-size: 18px; }
 
         #roomView { display: none; }
         
@@ -92,19 +108,30 @@
 <body>
 
     <div class="app-container">
-        <!-- شاشة إنشاء الجمعية -->
         <div id="createView">
             <i class="fa-solid fa-layer-group icon-header"></i>
             <h1>تأسيس جمعية جديدة</h1>
-            <p class="subtitle">حدد عدد الخانات لإنشاء رابط السحب وإرساله للمشتركين</p>
+            <p class="subtitle">حدد الإجمالي أولاً، ثم ثبت المراكز المطلوبة إن وجدت</p>
             
-            <input type="number" id="slotsCount" placeholder="عدد المشتركين (مثال: 10)" min="2" max="50">
+            <input type="number" id="slotsCount" placeholder="العدد الإجمالي للمشتركين (مثال: 10)" min="2" max="50" oninput="showPreAssignBox()">
+            
+            <div class="pre-assign-box" id="preAssignBox">
+                <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--accent-color);"><i class="fa-solid fa-thumbtack"></i> حجز مراكز ثابتة مسبقاً</h3>
+                <div class="pre-assign-inputs">
+                    <input type="number" id="fixedNum" placeholder="المركز" style="width: 30%;">
+                    <input type="text" id="fixedName" placeholder="اسم الشخص (مثال: عاصم)" style="width: 70%;">
+                </div>
+                <button class="btn-secondary" onclick="addFixedSlot()">
+                    <i class="fa-solid fa-plus"></i> تثبيت المركز
+                </button>
+                <div id="fixedListUI" style="margin-top: 15px;"></div>
+            </div>
+
             <button onclick="createRoom()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة الآن
+                <i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة وبدء السحب
             </button>
         </div>
 
-        <!-- شاشة الغرفة -->
         <div id="roomView">
             <button class="copy-link-btn" onclick="copyLink()">
                 <i class="fa-solid fa-link"></i> انسخ الرابط وأرسله للمشتركين
@@ -121,7 +148,7 @@
 
             <div id="drawTab" class="tab-content active draw-section">
                 <div class="slots-info">
-                    الخانات المتبقية: <span id="remainingCount">-</span> من أصل <span id="totalCount">-</span>
+                    الخانات المتبقية للسحب: <span id="remainingCount">-</span> من أصل <span id="totalCount">-</span>
                 </div>
                 
                 <div id="drawActionArea">
@@ -154,8 +181,7 @@
             projectId: "ko3a-d7e0d",
             storageBucket: "ko3a-d7e0d.firebasestorage.app",
             messagingSenderId: "1074124539072",
-            appId: "1:1074124539072:web:e42fffcea5a5bb4b665925",
-            measurementId: "G-EJPHFM7PWC"
+            appId: "1:1074124539072:web:e42fffcea5a5bb4b665925"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -164,7 +190,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
         
-        // إنشاء بصمة مميزة للجهاز (تُحفظ في المتصفح وتُرسل للسيرفر)
         let myDeviceId = localStorage.getItem('device_fingerprint');
         if (!myDeviceId) {
             myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 12);
@@ -174,7 +199,8 @@
         let totalSlots = 0;
         let availableSlots = [];
         let filledSlots = {}; 
-        let drawnDevices = []; // مصفوفة جديدة لحفظ بصمات الأجهزة التي قامت بالسحب
+        let drawnDevices = []; 
+        let tempFixedSlots = {}; // كائن لحفظ المراكز الثابتة قبل إنشاء الغرفة
 
         if (roomId) {
             document.getElementById('createView').style.display = 'none';
@@ -182,28 +208,81 @@
             listenToRoom();
         }
 
+        // إظهار قسم المراكز الثابتة بمجرد كتابة العدد
+        window.showPreAssignBox = function() {
+            const count = parseInt(document.getElementById('slotsCount').value);
+            if (count > 0) {
+                document.getElementById('preAssignBox').style.display = 'block';
+            } else {
+                document.getElementById('preAssignBox').style.display = 'none';
+            }
+        }
+
+        // إضافة مركز ثابت
+        window.addFixedSlot = function() {
+            const count = parseInt(document.getElementById('slotsCount').value);
+            const num = parseInt(document.getElementById('fixedNum').value);
+            const name = document.getElementById('fixedName').value.trim();
+
+            if (!num || num < 1 || num > count) { alert('أدخل رقم مركز صحيح ضمن العدد الإجمالي!'); return; }
+            if (!name) { alert('أدخل اسم الشخص!'); return; }
+            if (Object.values(tempFixedSlots).includes(name)) { alert('هذا الاسم تم حجزه بالفعل!'); return; }
+            
+            tempFixedSlots[num] = name;
+            document.getElementById('fixedNum').value = '';
+            document.getElementById('fixedName').value = '';
+            renderFixedListUI();
+        }
+
+        // مسح مركز ثابت
+        window.removeFixedSlot = function(num) {
+            delete tempFixedSlots[num];
+            renderFixedListUI();
+        }
+
+        function renderFixedListUI() {
+            const listUI = document.getElementById('fixedListUI');
+            listUI.innerHTML = '';
+            for (let [num, name] of Object.entries(tempFixedSlots)) {
+                listUI.innerHTML += `
+                    <div class="fixed-list-item">
+                        <span>المركز <strong style="color:var(--accent-color)">${num}</strong>: ${name}</span>
+                        <button class="btn-delete-fixed" onclick="removeFixedSlot(${num})"><i class="fa-solid fa-circle-xmark"></i></button>
+                    </div>
+                `;
+            }
+        }
+
         window.createRoom = async function() {
             const count = parseInt(document.getElementById('slotsCount').value);
-            if (!count || count < 2) { alert('أدخل رقماً صحيحاً (أكبر من 1)'); return; }
+            if (!count || count < 2) { alert('أدخل رقماً إجمالياً صحيحاً (أكبر من 1)'); return; }
 
-            const btn = document.querySelector('#createView button');
+            const btn = document.querySelector('#createView button:last-child');
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تأسيس الغرفة...`;
             btn.disabled = true;
 
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-            let slotsArray = Array.from({length: count}, (_, i) => i + 1);
+            
+            // توليد قائمة الأرقام المتاحة للسحب مع استبعاد المراكز المحجوزة
+            let slotsArray = [];
+            for (let i = 1; i <= count; i++) {
+                if (!tempFixedSlots[i]) {
+                    slotsArray.push(i);
+                }
+            }
 
             try {
+                // حفظ البيانات، وتمرير المراكز المحجوزة لتصبح مشغولة مسبقاً
                 await setDoc(doc(db, "rooms", randomId), {
                     totalSlots: count,
                     availableSlots: slotsArray,
-                    filledSlots: {},
-                    drawnDevices: [] // تهيئة مصفوفة الأجهزة
+                    filledSlots: tempFixedSlots,
+                    drawnDevices: [] 
                 });
                 window.location.search = `?room=${randomId}`;
             } catch (error) {
                 alert("حدث خطأ! يرجى المحاولة مرة أخرى.");
-                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة الآن`;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة وبدء السحب`;
                 btn.disabled = false;
             }
         };
@@ -229,19 +308,17 @@
             const myStoredSlot = localStorage.getItem(`drawn_${roomId}`);
             const myStoredName = localStorage.getItem(`name_${roomId}`);
 
-            // حماية الواجهة: التحقق من ذاكرة المتصفح أولاً
             if (myStoredSlot) {
                 document.getElementById('drawActionArea').style.display = 'none';
                 document.getElementById('myResult').style.display = 'block';
                 document.getElementById('resName').innerText = myStoredName;
                 document.getElementById('resSlot').innerText = myStoredSlot;
             } 
-            // حماية إضافية: إذا تم مسح ذاكرة المتصفح، ولكن بصمة الجهاز مسجلة في السيرفر
             else if (drawnDevices.includes(myDeviceId)) {
-                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--danger); padding:20px; font-weight:bold;">لقد قمت بالسحب مسبقاً من هذا الجهاز، لا يمكنك السحب مرة أخرى!</p>`;
+                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--danger); padding:20px; font-weight:bold;">لقد قمت بالسحب مسبقاً من هذا الجهاز!</p>`;
             }
             else if (availableSlots.length === 0) {
-                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--text-muted); padding:20px;">اكتمل سحب جميع الخانات!</p>`;
+                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--text-muted); padding:20px;">اكتمل سحب جميع الخانات المتاحة!</p>`;
             }
 
             const boardList = document.getElementById('boardList');
@@ -269,7 +346,6 @@
 
             if (!name) { alert('يجب كتابة اسمك أولاً!'); return; }
 
-            // التحقق من أن هذا الجهاز لم يقم بالسحب (حماية السيرفر)
             if (drawnDevices.includes(myDeviceId)) {
                 alert("تم رصد محاولة سحب متكررة من نفس الجهاز! العملية مرفوضة.");
                 return;
@@ -292,8 +368,7 @@
                     let currentFilled = data.filledSlots || {};
                     let currentDevices = data.drawnDevices || [];
 
-                    if (currentAvailable.length === 0) throw "لا توجد خانات فارغة!";
-                    // التحقق النهائي داخل الـ Transaction لمنع أي تلاعب
+                    if (currentAvailable.length === 0) throw "لا توجد خانات فارغة للسحب!";
                     if (currentDevices.includes(myDeviceId)) throw "لقد قمت بالسحب مسبقاً!";
 
                     const randomIndex = Math.floor(Math.random() * currentAvailable.length);
@@ -301,7 +376,7 @@
 
                     currentAvailable.splice(randomIndex, 1);
                     currentFilled[selectedSlot] = name;
-                    currentDevices.push(myDeviceId); // تسجيل بصمة الجهاز
+                    currentDevices.push(myDeviceId); 
 
                     transaction.update(roomRef, {
                         availableSlots: currentAvailable,
@@ -329,7 +404,7 @@
 
         window.copyLink = function() {
             navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ الرابط! أرسله للمشتركين ليدخل كل منهم لسحب خانته.');
+            alert('تم نسخ الرابط! أرسله للمشتركين ليدخل كل منهم لسحب الخانات المتبقية.');
         }
     </script>
 </body>
