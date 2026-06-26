@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة قرعة الجمعيات الذكية</title>
+    <title>منصة قرعة الجمعيات التفاعلية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --danger: #ff5252;
+            --warning: #fbbf24;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
@@ -45,11 +46,11 @@
         header h1 i { color: var(--accent-color); margin-left: 10px; }
         header p { color: var(--text-muted); font-size: 14px; }
 
-        /* شاشة الدخول والإنشاء */
+        /* شاشة البداية */
         #landingView { display: flex; flex-direction: column; gap: 20px; text-align: center; }
         .welcome-icon { font-size: 60px; color: var(--accent-color); margin-bottom: 10px; }
         
-        /* شاشة التطبيق الرئيسية */
+        /* شاشة الغرفة */
         #appView { display: none; }
 
         .room-badge {
@@ -66,55 +67,71 @@
 
         .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
         input[type="text"] {
-            flex: 1;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            padding: 12px 15px;
-            color: var(--text-main);
-            font-size: 16px;
-            outline: none;
+            flex: 1; background-color: #0f172a; border: 1px solid #334155;
+            border-radius: 10px; padding: 12px 15px; color: var(--text-main); font-size: 16px; outline: none;
         }
         input[type="text"]:focus { border-color: var(--accent-color); }
 
         button {
             cursor: pointer; border: none; border-radius: 10px; padding: 12px 20px;
             font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s;
         }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-main { background-color: var(--accent-color); color: #000; width: 100%; padding: 15px; font-size: 18px; }
         .btn-secondary { background-color: #1e293b; color: var(--text-main); border: 1px solid #334155; }
         .btn-add { background-color: var(--accent-color); color: #000; }
-        .btn-draw { background-color: #6366f1; color: #fff; width: 100%; padding: 15px; font-size: 18px; margin-bottom: 25px; }
+        .btn-start { background-color: var(--warning); color: #000; width: 100%; padding: 15px; font-size: 18px; margin-top: 15px; }
+        .btn-draw-action { background-color: #6366f1; color: #fff; padding: 8px 15px; font-size: 14px; }
+        .btn-draw-action:hover { background-color: #4f46e5; }
         .btn-share { background-color: #25d366; color: #fff; width: 100%; margin-top: 15px; }
         .btn-delete { background: none; color: var(--text-muted); }
         .btn-delete:hover { color: var(--danger); }
 
         .section-title { font-size: 16px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .list-container { background-color: #0f172a; border-radius: 12px; max-height: 200px; overflow-y: auto; border: 1px solid #1e293b; }
-        .participant-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #1e293b; }
+        .list-container { background-color: #0f172a; border-radius: 12px; max-height: 350px; overflow-y: auto; border: 1px solid #1e293b; }
         
-        .result-section { display: none; background-color: #0f172a; border-radius: 12px; padding: 20px; border: 1px solid rgba(0, 230, 118, 0.3); margin-top: 25px; }
-        .shuffling-animation { display: none; text-align: center; font-size: 24px; color: var(--accent-color); padding: 20px; }
-        .shuffling-animation i { animation: spin 1s linear infinite; margin-bottom: 10px; }
+        .participant-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; border-bottom: 1px solid #1e293b; 
+        }
+        .participant-name { font-size: 16px; font-weight: 600; }
+        
+        .status-badge {
+            background-color: rgba(0, 230, 118, 0.1);
+            color: var(--accent-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            animation: popIn 0.3s ease;
+        }
 
-        .result-table { width: 100%; border-collapse: collapse; }
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 15px;}
         .result-table th, .result-table td { padding: 12px; text-align: right; }
         .result-table th { color: var(--accent-color); border-bottom: 2px solid #1e293b; }
         .result-table td { border-bottom: 1px solid #1e293b; }
-        .badge-turn { background-color: #1e293b; color: var(--accent-color); padding: 2px 8px; border-radius: 6px; font-weight: 600; }
 
+        .phase-banner {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border-right: 4px solid var(--warning);
+        }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinning { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div id="landingView">
-            <i class="fa-solid fa-layer-group welcome-icon"></i>
+            <i class="fa-solid fa-users-viewfinder welcome-icon"></i>
             <header>
-                <h1>قرعة الجمعية الرقمية</h1>
-                <p>أنشئ غرفتك السحابية وشارك القرعة مع أصدقائك لحظياً وبالمجان</p>
+                <h1>قرعة الجمعية التفاعلية</h1>
+                <p>كل مشترك يسحب دوره بنفسه لضمان أعلى درجات الشفافية</p>
             </header>
             <button class="button btn-main" onclick="createNewRoom()">
                 <i class="fa-solid fa-plus"></i> إنشاء غُرفة جمعية جديدة
@@ -125,16 +142,21 @@
             <div class="room-badge">
                 <span><i class="fa-solid fa-link" style="color: var(--accent-color); margin-left: 5px;"></i> رابط الغرفة نشط سحابياً</span>
                 <button class="button btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="copyRoomLink()">
-                    <i class="fa-solid fa-copy"></i> نسخ رابط الدعوة
+                    <i class="fa-solid fa-copy"></i> نسخ الرابط للجروب
                 </button>
             </div>
 
             <header>
-                <h1><i class="fa-solid fa-dice"></i> إدارة القرعة</h1>
-                <p>الأسماء والنتائج تتزامن تلقائياً لدى جميع المشتركين المفتوح لديهم الرابط</p>
+                <h1><i class="fa-solid fa-dice"></i> سحب الأدوار</h1>
+                <p id="roomSubtitle">أضف الأسماء، ثم افتح باب السحب للجميع</p>
             </header>
 
-            <div class="input-group">
+            <div id="phaseBanner" class="phase-banner" style="display: none;">
+                <h3 id="phaseTitle" style="color: var(--warning); font-size: 16px;">مرحلة السحب مفتوحة</h3>
+                <p id="phaseDesc" style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">كل شخص يضغط على زر السحب بجوار اسمه للحصول على دوره</p>
+            </div>
+
+            <div class="input-group" id="inputGroup">
                 <input type="text" id="nameInput" placeholder="اكتب اسم المشترك هنا...">
                 <button class="button btn-add" id="addBtn">
                     <i class="fa-solid fa-plus"></i> إضافة
@@ -143,34 +165,25 @@
 
             <div class="participants-section">
                 <div class="section-title">
-                    <span>قائمة المشتركين الحالية</span>
+                    <span>قائمة المشتركين</span>
                     <span id="participantCount">العدد: 0</span>
                 </div>
                 <div class="list-container" id="participantsList"></div>
             </div>
 
-            <button class="button btn-draw" id="drawBtn">
-                <i class="fa-solid fa-shuffle"></i> بدء سحب القرعة العشوائية للجميع
+            <button class="button btn-start" id="startPhaseBtn" style="display: none;">
+                <i class="fa-solid fa-unlock-keyhole"></i> فتح باب السحب للمشتركين
             </button>
 
-            <div class="shuffling-animation" id="shufflingBox">
-                <i class="fa-solid fa-spinner"></i>
-                <div>جاري تدوير الأدوار على هواتف المشتركين...</div>
-            </div>
-
-            <div class="result-section" id="resultSection">
-                <h3 style="color: var(--accent-color); margin-bottom: 15px; font-size: 18px;"><i class="fa-solid fa-square-poll-vertical"></i> الترتيب النهائي المعتمد:</h3>
+            <div id="finalResultsSection" style="display: none;">
                 <table class="result-table">
                     <thead>
-                        <tr>
-                            <th>الدور</th>
-                            <th>اسم المشتـرك</th>
-                        </tr>
+                        <tr><th>الدور</th><th>اسم المشتـرك</th></tr>
                     </thead>
-                    <tbody id="resultBody"></tbody>
+                    <tbody id="finalResultBody"></tbody>
                 </table>
                 <button class="button btn-share" onclick="copyResultsToClipboard()">
-                    <i class="fa-solid fa-copy"></i> نسخ الترتيب كرسالة منسقة للواتساب
+                    <i class="fa-solid fa-copy"></i> نسخ الترتيب النهائي للواتساب
                 </button>
             </div>
         </div>
@@ -178,27 +191,28 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // ⚠️ ضع هنا بيانات مشروعك التي نسختها من Firebase Console
+        // بيانات مشروعك الخاصة التي أرسلتها
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDjbmmc2fbNZvM_i39GepPojSQIZk4oaI0",
+            authDomain: "ko3a-d7e0d.firebaseapp.com",
+            projectId: "ko3a-d7e0d",
+            storageBucket: "ko3a-d7e0d.firebasestorage.app",
+            messagingSenderId: "1074124539072",
+            appId: "1:1074124539072:web:e42fffcea5a5bb4b665925",
+            measurementId: "G-EJPHFM7PWC"
         };
 
-        // تهيئة الـ SDK
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // إدارة منطق الغرف من خلال الـ URL
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
+        
         let participants = [];
-        let lastDraw = [];
+        let results = {}; // ستحفظ النتائج بصيغة: { "أحمد": 2, "علي": 1 }
+        let roomStatus = 'gathering'; // gathering | drawing | finished
 
         if (roomId) {
             document.getElementById('landingView').style.display = 'none';
@@ -206,19 +220,17 @@
             listenToRoom(roomId);
         }
 
-        // إنشاء غرفة عشوائية جديدة
         window.createNewRoom = function() {
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
             window.location.search = `?room=${randomId}`;
         }
 
-        // نسخ رابط الغرفة لإرساله للجروب
         window.copyRoomLink = function() {
             navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ رابط الجمعية السحابي بنجاح! أرسله الآن لأعضاء الجمعية على واتساب ليتابعوا السحب معك حياً.');
+            alert('تم نسخ الرابط! أرسله للجروب ليدخل الجميع ويسحبوا أدوارهم.');
         }
 
-        // الاستماع اللحظي للبيانات في Firebase
+        // الاستماع لتحديثات الغرفة
         function listenToRoom(id) {
             const roomRef = doc(db, "rooms", id);
             
@@ -226,64 +238,113 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     participants = data.participants || [];
-                    lastDraw = data.lastDraw || [];
+                    results = data.results || {};
+                    roomStatus = data.status || 'gathering';
                     
-                    updateParticipantsUI();
-                    
-                    if (data.isShuffling) {
-                        document.getElementById('resultSection').style.display = 'none';
-                        document.getElementById('shufflingBox').style.display = 'block';
-                        document.getElementById('drawBtn').disabled = true;
-                    } else {
-                        document.getElementById('shufflingBox').style.display = 'none';
-                        document.getElementById('drawBtn').disabled = false;
-                        
-                        if (lastDraw.length > 0) {
-                            renderResultsUI(lastDraw);
-                        } else {
-                            document.getElementById('resultSection').style.display = 'none';
-                        }
-                    }
+                    updateUI();
                 } else {
-                    // إذا كانت الغرفة جديدة تماماً، ننشئ المستند في قاعدة البيانات
-                    setDoc(roomRef, { participants: [], lastDraw: [], isShuffling: false });
+                    setDoc(roomRef, { participants: [], results: {}, status: 'gathering', availableTurns: [] });
                 }
             });
         }
 
-        // تحديث قائمة الأسماء في الواجهة
-        function updateParticipantsUI() {
+        function updateUI() {
             const list = document.getElementById('participantsList');
             document.getElementById('participantCount').innerText = `العدد: ${participants.length}`;
             list.innerHTML = '';
 
-            if (participants.length === 0) {
-                list.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 14px;">لا يوجد مشتركين مضافين، ابدأ بكتابة الأسماء</div>`;
-                return;
+            const inputGroup = document.getElementById('inputGroup');
+            const startBtn = document.getElementById('startPhaseBtn');
+            const phaseBanner = document.getElementById('phaseBanner');
+            const finalResultsSection = document.getElementById('finalResultsSection');
+            const subtitle = document.getElementById('roomSubtitle');
+
+            // 1. مرحلة التجميع (إضافة الأسماء)
+            if (roomStatus === 'gathering') {
+                inputGroup.style.display = 'flex';
+                phaseBanner.style.display = 'none';
+                finalResultsSection.style.display = 'none';
+                subtitle.innerText = "أضف الأسماء، ثم افتح باب السحب للجميع";
+
+                if (participants.length >= 2) {
+                    startBtn.style.display = 'block';
+                } else {
+                    startBtn.style.display = 'none';
+                }
+
+                participants.forEach((name, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'participant-item';
+                    item.innerHTML = `
+                        <span class="participant-name">${name}</span>
+                        <button class="btn-delete" onclick="removeParticipant(${index})"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    list.appendChild(item);
+                });
+            } 
+            
+            // 2. مرحلة السحب (كل شخص يسحب دوره)
+            else if (roomStatus === 'drawing') {
+                inputGroup.style.display = 'none';
+                startBtn.style.display = 'none';
+                phaseBanner.style.display = 'block';
+                finalResultsSection.style.display = 'none';
+                subtitle.innerText = "يرجى من كل مشترك سحب دوره الآن";
+
+                participants.forEach((name) => {
+                    const item = document.createElement('div');
+                    item.className = 'participant-item';
+                    
+                    let actionHtml = '';
+                    if (results[name]) {
+                        // إذا سحب بالفعل
+                        actionHtml = `<div class="status-badge">الشهر ${results[name]}</div>`;
+                    } else {
+                        // إذا لم يسحب بعد (يظهر له الزر)
+                        actionHtml = `<button class="button btn-draw-action" onclick="drawMyTurn('${name}')" id="btn-${name}">
+                                        <i class="fa-solid fa-hand-pointer"></i> اسحب دوري
+                                      </button>`;
+                    }
+
+                    item.innerHTML = `
+                        <span class="participant-name">${name}</span>
+                        ${actionHtml}
+                    `;
+                    list.appendChild(item);
+                });
             }
 
-            participants.forEach((name, index) => {
-                const item = document.createElement('div');
-                item.className = 'participant-item';
-                item.innerHTML = `
-                    <span>${name}</span>
-                    <button class="btn-delete" data-index="${index}"><i class="fa-solid fa-trash"></i></button>
-                `;
-                list.appendChild(item);
-            });
+            // 3. مرحلة الانتهاء (تم سحب جميع الأدوار)
+            else if (roomStatus === 'finished') {
+                inputGroup.style.display = 'none';
+                startBtn.style.display = 'none';
+                phaseBanner.style.display = 'none';
+                subtitle.innerText = "اكتمل السحب! إليكم النتيجة النهائية";
+                
+                // إخفاء القائمة العادية وعرض الجدول المنظم
+                document.querySelector('.participants-section').style.display = 'none';
+                finalResultsSection.style.display = 'block';
 
-            // تفعيل أزرار الحذف لترفع التحديث للسيرفر
-            document.querySelectorAll('.btn-delete').forEach(button => {
-                button.onclick = async function() {
-                    const idx = this.getAttribute('data-index');
-                    participants.splice(idx, 1);
-                    const roomRef = doc(db, "rooms", roomId);
-                    await updateDoc(roomRef, { participants: participants, lastDraw: [] });
-                }
-            });
+                const finalBody = document.getElementById('finalResultBody');
+                finalBody.innerHTML = '';
+                
+                // ترتيب النتائج تصاعدياً حسب الشهر
+                const sortedResults = Object.keys(results).map(key => {
+                    return { name: key, turn: results[key] };
+                }).sort((a, b) => a.turn - b.turn);
+
+                sortedResults.forEach(res => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><div class="status-badge">الشهر ${res.turn}</div></td>
+                        <td><strong>${res.name}</strong></td>
+                    `;
+                    finalBody.appendChild(row);
+                });
+            }
         }
 
-        // إضافة اسم مشترك للسيرفر
+        // إضافة مستخدم
         document.getElementById('addBtn').onclick = async function() {
             const input = document.getElementById('nameInput');
             const name = input.value.trim();
@@ -291,58 +352,99 @@
 
             participants.push(name);
             input.value = '';
-            const roomRef = doc(db, "rooms", roomId);
-            await updateDoc(roomRef, { participants: participants });
+            await updateDoc(doc(db, "rooms", roomId), { participants: participants });
             input.focus();
         };
 
-        // إجراء القرعة ومزامنتها سحابياً
-        document.getElementById('drawBtn').onclick = async function() {
-            if (participants.length < 2) {
-                alert('أضف شخصين على الأقل لإجراء السحب!');
-                return;
-            }
-
-            const roomRef = doc(db, "rooms", roomId);
-            // 1. إبلاغ جميع الهواتف ببدء الأنيميشن
-            await updateDoc(roomRef, { isShuffling: true });
-
-            setTimeout(async () => {
-                let shuffled = [...participants];
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                
-                // 2. رفع النتيجة النهائية وإيقاف الأنيميشن عند الجميع في نفس اللحظة
-                await updateDoc(roomRef, {
-                    isShuffling: false,
-                    lastDraw: shuffled
-                });
-            }, 2000);
+        // حذف مستخدم (متاح عالمياً)
+        window.removeParticipant = async function(index) {
+            participants.splice(index, 1);
+            await updateDoc(doc(db, "rooms", roomId), { participants: participants });
         };
 
-        function renderResultsUI(results) {
-            const body = document.getElementById('resultBody');
-            body.innerHTML = '';
-            results.forEach((name, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><span class="badge-turn">الشهر ${index + 1}</span></td>
-                    <td><strong>${name}</strong></td>
-                `;
-                body.appendChild(row);
-            });
-            document.getElementById('resultSection').style.display = 'block';
-        }
+        // تحويل الغرفة لوضع السحب وتوليد الأرقام المخفية
+        document.getElementById('startPhaseBtn').onclick = async function() {
+            if (confirm('هل تأكدت من إضافة جميع الأسماء؟ لن تتمكن من إضافة أسماء جديدة بعد فتح باب السحب.')) {
+                // إنشاء مصفوفة بالأرقام المتاحة [1, 2, 3, ...] حسب عدد المشتركين
+                let turns = [];
+                for (let i = 1; i <= participants.length; i++) {
+                    turns.push(i);
+                }
 
+                await updateDoc(doc(db, "rooms", roomId), {
+                    status: 'drawing',
+                    availableTurns: turns,
+                    results: {}
+                });
+            }
+        };
+
+        // دالة سحب الدور الخاص بالمستخدم (باستخدام Transaction لمنع التعارض)
+        window.drawMyTurn = async function(name) {
+            if(!confirm(`تأكيد: هل أنت متأكد أنك تريد سحب الدور الخاص بـ ( ${name} )؟`)) return;
+
+            const btn = document.getElementById(`btn-${name}`);
+            btn.innerHTML = `<i class="fa-solid fa-spinner spinning"></i> جاري السحب...`;
+            btn.disabled = true;
+
+            const roomRef = doc(db, "rooms", roomId);
+
+            try {
+                // استخدام Transaction لضمان عدم سحب شخصين لنفس الشهر في نفس اللحظة
+                await runTransaction(db, async (transaction) => {
+                    const roomDoc = await transaction.get(roomRef);
+                    if (!roomDoc.exists()) throw "الغرفة غير موجودة!";
+                    
+                    const data = roomDoc.data();
+                    let currentAvailable = data.availableTurns || [];
+                    let currentResults = data.results || {};
+
+                    // التأكد أنه لم يسحب مسبقاً وأن هناك أدوار متاحة
+                    if (currentResults[name] || currentAvailable.length === 0) return;
+
+                    // اختيار دور عشوائي من الأدوار المتاحة
+                    const randomIndex = Math.floor(Math.random() * currentAvailable.length);
+                    const selectedTurn = currentAvailable[randomIndex];
+
+                    // إزالة الدور المسحوب من قائمة المتاحين
+                    currentAvailable.splice(randomIndex, 1);
+                    
+                    // تسجيل النتيجة
+                    currentResults[name] = selectedTurn;
+
+                    // التحقق مما إذا كان هذا هو الشخص الأخير
+                    let newStatus = currentAvailable.length === 0 ? 'finished' : 'drawing';
+
+                    // رفع التحديث للسيرفر
+                    transaction.update(roomRef, {
+                        availableTurns: currentAvailable,
+                        results: currentResults,
+                        status: newStatus
+                    });
+                });
+            } catch (error) {
+                console.error("فشل السحب:", error);
+                alert("حدث خطأ أثناء السحب، حاول مرة أخرى.");
+                btn.innerHTML = `<i class="fa-solid fa-hand-pointer"></i> اسحب دوري`;
+                btn.disabled = false;
+            }
+        };
+
+        // نسخ النتيجة النهائية للواتساب
         window.copyResultsToClipboard = function() {
-            if (lastDraw.length === 0) return;
-            let msg = "📊 *نتائج قرعة الجمعية الرسمية* 📊\n----------------------------\n";
-            lastDraw.forEach((name, index) => { msg += `🌙 الشهر [${index + 1}]: ${name}\n`; });
-            msg += "----------------------------\nتمت القرعة لحظياً وبكل شفافية سحابياً 🚀";
+            let msg = "📊 *النتيجة النهائية لقرعة الجمعية* 📊\n----------------------------\n";
+            
+            const sortedResults = Object.keys(results).map(key => {
+                return { name: key, turn: results[key] };
+            }).sort((a, b) => a.turn - b.turn);
+
+            sortedResults.forEach(res => { 
+                msg += `🌙 الشهر [${res.turn}]: ${res.name}\n`; 
+            });
+            msg += "----------------------------\nتم سحب الأدوار فردياً بشفافية تامة 🚀";
+            
             navigator.clipboard.writeText(msg);
-            alert('تم نسخ الترتيب! قم بلصقه بجروب الواتساب الآن.');
+            alert('تم نسخ الترتيب النهائي! قم بلصقه بجروب الواتساب الآن.');
         }
     </script>
 </body>
