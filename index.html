@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة قرعة الجمعيات الذكية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* تصميم حدسي محترف بأسلوب Noir/Minimalist */
+        :root {
+            --bg-color: #090d16;
+            --card-bg: #131a26;
+            --accent-color: #00e676;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --danger: #ff5252;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1e293b;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        header h1 i {
+            color: var(--accent-color);
+            margin-left: 10px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: var(--text-main);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-add {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .btn-add:hover {
+            background-color: #00b359;
+        }
+
+        .btn-draw {
+            background-color: #6366f1;
+            color: #fff;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        .btn-draw:hover {
+            background-color: #4f46e5;
+        }
+
+        .btn-share {
+            background-color: #25d366;
+            color: #fff;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .participants-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .list-container {
+            background-color: #0f172a;
+            border-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #1e293b;
+        }
+
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #1e293b;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+
+        .btn-delete {
+            background: none;
+            color: var(--text-muted);
+            padding: 5px;
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+        }
+
+        /* منطقة الحماس والقرعة */
+        .result-section {
+            display: none;
+            background-color: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            margin-top: 25px;
+        }
+
+        .shuffling-animation {
+            display: none;
+            text-align: center;
+            font-size: 24px;
+            color: var(--accent-color);
+            padding: 20px;
+        }
+
+        .shuffling-animation i {
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .result-table th, .result-table td {
+            padding: 12px;
+            text-align: right;
+        }
+
+        .result-table th {
+            color: var(--accent-color);
+            border-bottom: 2px solid #1e293b;
+            font-size: 14px;
+        }
+
+        .result-table td {
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .badge-turn {
+            background-color: #1e293b;
+            color: var(--accent-color);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* تأثيرات حركية */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* تخصيص السكرول بار ليناسب المظهر الداكن */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fa-solid fa-dice"></i>قرعة الجمعية الذكية</h1>
+            <p>أدخل أسماء المشتركين لإجراء سحب عشوائي عادل وشفاف</p>
+        </header>
+
+        <div class="input-group">
+            <input type="text" id="nameInput" placeholder="اكتب اسم المشترك هنا..." onkeypress="handleKeyPress(event)">
+            <button class="button btn-add" onclick="addParticipant()">
+                <i class="fa-solid fa-plus"></i> إضافة
+            </button>
+        </div>
+
+        <div class="participants-section">
+            <div class="section-title">
+                <span>قائمة المشتركين</span>
+                <span id="participantCount">العدد: 0</span>
+            </div>
+            <div class="list-container" id="participantsList">
+                </div>
+        </div>
+
+        <button class="button btn-draw" id="drawBtn" onclick="runDraw()">
+            <i class="fa-solid fa-shuffle"></i> بدء سحب القرعة العشوائية
+        </button>
+
+        <div class="shuffling-animation" id="shufflingBox">
+            <i class="fa-solid fa-spinner"></i>
+            <div>جاري تدوير الأدوار خوارزمياً...</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px; font-size: 18px;"><i class="fa-solid fa-square-poll-vertical"></i> الترتيب النهائي للأدوار:</h3>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>الدور (الشهر)</th>
+                        <th>اسم المشتـرك</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                    </tbody>
+            </table>
+            <button class="button btn-share" onclick="copyResults()">
+                <i class="fa-solid fa-copy"></i> نسخ الترتيب لإرساله على واتساب
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // مصفوفة لتخزين الأسماء محلياً
+        let participants = [];
+
+        // استرجاع البيانات من ذاكرة المتصفح المحلية إن وجدت لتجنب الضياع عند إعادة التحديث
+        if (localStorage.getItem('participants')) {
+            participants = JSON.parse(localStorage.getItem('participants'));
+            updateUI();
+        }
+
+        function addParticipant() {
+            const input = document.getElementById('nameInput');
+            const name = input.value.trim();
+            
+            if (name === '') return;
+            
+            if (participants.includes(name)) {
+                alert('هذا الاسم موجود بالفعل في الجمعية!');
+                return;
+            }
+
+            participants.push(name);
+            saveToLocalStorage();
+            input.value = '';
+            input.focus();
+            updateUI();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addParticipant();
+            }
+        }
+
+        function deleteParticipant(index) {
+            participants.splice(index, 1);
+            saveToLocalStorage();
+            updateUI();
+            // إخفاء لوحة النتائج القديمة إذا تم التعديل على الأسماء
+            document.getElementById('resultSection').style.display = 'none';
+        }
+
+        function updateUI() {
+            const list = document.getElementById('participantsList');
+            const count = document.getElementById('participantCount');
+            
+            list.innerHTML = '';
+            count.innerText = `العدد: ${participants.length}`;
+
+            if (participants.length === 0) {
+                list.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 20px; font-size: 14px;">لا يوجد مشتركين مضافين بعد</div>`;
+                return;
+            }
+
+            participants.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                item.innerHTML = `
+                    <span>${name}</span>
+                    <button class="btn-delete" onclick="deleteParticipant(${index})"><i class="fa-solid fa-trash"></i></button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('participants', JSON.stringify(participants));
+        }
+
+        // خوارزمية القرعة العشوائية (Fisher-Yates Shuffle) لضمان عدالة كاملة
+        function runDraw() {
+            if (participants.length < 2) {
+                alert('يرجى إضافة شخصين على الأقل لإجراء القرعة!');
+                return;
+            }
+
+            const drawBtn = document.getElementById('drawBtn');
+            const shufflingBox = document.getElementById('shufflingBox');
+            const resultSection = document.getElementById('resultSection');
+            
+            // إخفاء النتائج الحالية وإظهار الأنيميشن لزيادة الحماس والتفاعل
+            resultSection.style.display = 'none';
+            shufflingBox.style.display = 'block';
+            drawBtn.disabled = true;
+
+            setTimeout(() => {
+                // عمل نسخة من المصفوفة لعدم تخريب الترتيب الأصلي عند الإضافة
+                let shuffled = [...participants];
+                
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+
+                // عرض النتائج في الجدول
+                const resultBody = document.getElementById('resultBody');
+                resultBody.innerHTML = '';
+
+                shuffled.forEach((name, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="badge-turn">الشهر ${index + 1}</span></td>
+                        <td><strong>${name}</strong></td>
+                    `;
+                    resultBody.appendChild(row);
+                });
+
+                // إخفاء الأنيميشن وإظهار النتائج
+                shufflingBox.style.display = 'none';
+                resultSection.style.display = 'block';
+                drawBtn.disabled = false;
+                
+                // تخزين الترتيب الأخير في الذاكرة لتسهيل العودة له
+                localStorage.setItem('lastDraw', JSON.stringify(shuffled));
+            }, 2000); // 2 ثانية حماس وانتظار
+        }
+
+        // ميزة نسخ الترتيب لمشاركته في جروب الواتساب الخاص بالجمعية مباشرة
+        function copyResults() {
+            const lastDraw = JSON.parse(localStorage.getItem('lastDraw'));
+            if (!lastDraw) return;
+
+            let textMessage = "📊 *نتائج قرعة الجمعية الرسمية* 📊\n";
+            textMessage += "----------------------------\n";
+            lastDraw.forEach((name, index) => {
+                textMessage += `🌙 الشهر [${index + 1}]: ${name}\n`;
+            });
+            textMessage += "----------------------------\n";
+            textMessage += "تمت القرعة عشوائياً وبكل شفافية عبر المنصة الرقمية 🚀";
+
+            navigator.clipboard.writeText(textMessage).then(() => {
+                alert('تم نسخ الترتيب بنجاح كرسالة منسقة! اذهب لجروب الواتساب الآن وقم بعمل لصق (Paste).');
+            }).catch(err => {
+                alert('حدث خطأ أثناء النسخ، يرجى المحاولة مرة أخرى.');
+            });
+        }
+    </script>
+</body>
+</html>
