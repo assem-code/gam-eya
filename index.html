@@ -14,7 +14,7 @@
         :root {
             --bg-color: #0b0f19;
             --card-bg: #151b2b;
-            --accent-color: #00e676; /* أخضر نيون للإشارة للنجاح */
+            --accent-color: #00e676;
             --text-main: #f8fafc;
             --text-muted: #64748b;
             --border-color: #1e293b;
@@ -32,7 +32,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* شاشة الإنشاء */
         #createView { text-align: center; }
         .icon-header { font-size: 50px; color: var(--accent-color); margin-bottom: 20px; }
         h1 { font-size: 24px; margin-bottom: 10px; }
@@ -52,7 +51,6 @@
         button:active { transform: scale(0.97); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* شاشة الغرفة والتبويبات */
         #roomView { display: none; }
         
         .tabs { display: flex; background: #0f172a; border-radius: 12px; margin-bottom: 25px; padding: 5px; }
@@ -65,7 +63,6 @@
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
 
-        /* تصميم قسم السحب */
         .draw-section { text-align: center; padding: 20px 0; }
         .slots-info { background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; }
         .slots-info span { font-size: 20px; font-weight: bold; color: var(--accent-color); }
@@ -76,7 +73,6 @@
         }
         .result-card h2 { font-size: 40px; color: var(--accent-color); margin: 10px 0; }
 
-        /* تصميم لوحة الترتيب */
         .board-list { display: flex; flex-direction: column; gap: 10px; }
         .board-item {
             display: flex; justify-content: space-between; align-items: center;
@@ -96,6 +92,7 @@
 <body>
 
     <div class="app-container">
+        <!-- شاشة إنشاء الجمعية -->
         <div id="createView">
             <i class="fa-solid fa-layer-group icon-header"></i>
             <h1>تأسيس جمعية جديدة</h1>
@@ -107,6 +104,7 @@
             </button>
         </div>
 
+        <!-- شاشة الغرفة -->
         <div id="roomView">
             <button class="copy-link-btn" onclick="copyLink()">
                 <i class="fa-solid fa-link"></i> انسخ الرابط وأرسله للمشتركين
@@ -136,13 +134,12 @@
                 <div id="myResult" class="result-card">
                     <p>مبروك يا <span id="resName"></span>! دورك هو الشهر:</p>
                     <h2 id="resSlot"></h2>
-                    <p style="color: var(--text-muted); font-size: 12px; margin-top:10px;">تم تسجيل النتيجة وتثبيتها</p>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-top:10px;">تم تسجيل النتيجة وتثبيتها بجهازك</p>
                 </div>
             </div>
 
             <div id="boardTab" class="tab-content">
-                <div class="board-list" id="boardList">
-                    </div>
+                <div class="board-list" id="boardList"></div>
             </div>
         </div>
     </div>
@@ -151,7 +148,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // بيانات مشروعك (ko3a-d7e0d)
         const firebaseConfig = {
             apiKey: "AIzaSyDjbmmc2fbNZvM_i39GepPojSQIZk4oaI0",
             authDomain: "ko3a-d7e0d.firebaseapp.com",
@@ -168,10 +164,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
         
-        // المتغيرات لحفظ حالة الجمعية
+        // إنشاء بصمة مميزة للجهاز (تُحفظ في المتصفح وتُرسل للسيرفر)
+        let myDeviceId = localStorage.getItem('device_fingerprint');
+        if (!myDeviceId) {
+            myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 12);
+            localStorage.setItem('device_fingerprint', myDeviceId);
+        }
+
         let totalSlots = 0;
         let availableSlots = [];
-        let filledSlots = {}; // { 1: "أحمد", 3: "محمود" }
+        let filledSlots = {}; 
+        let drawnDevices = []; // مصفوفة جديدة لحفظ بصمات الأجهزة التي قامت بالسحب
 
         if (roomId) {
             document.getElementById('createView').style.display = 'none';
@@ -179,28 +182,32 @@
             listenToRoom();
         }
 
-        // إنشاء غرفة جديدة
         window.createRoom = async function() {
             const count = parseInt(document.getElementById('slotsCount').value);
             if (!count || count < 2) { alert('أدخل رقماً صحيحاً (أكبر من 1)'); return; }
 
+            const btn = document.querySelector('#createView button');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تأسيس الغرفة...`;
+            btn.disabled = true;
+
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-            
-            // إنشاء مصفوفة الأرقام [1, 2, 3, ... count]
             let slotsArray = Array.from({length: count}, (_, i) => i + 1);
 
-            // حفظ الغرفة في فايربيز
-            await setDoc(doc(db, "rooms", randomId), {
-                totalSlots: count,
-                availableSlots: slotsArray,
-                filledSlots: {}
-            });
-
-            // تحويل المستخدم لرابط الغرفة
-            window.location.search = `?room=${randomId}`;
+            try {
+                await setDoc(doc(db, "rooms", randomId), {
+                    totalSlots: count,
+                    availableSlots: slotsArray,
+                    filledSlots: {},
+                    drawnDevices: [] // تهيئة مصفوفة الأجهزة
+                });
+                window.location.search = `?room=${randomId}`;
+            } catch (error) {
+                alert("حدث خطأ! يرجى المحاولة مرة أخرى.");
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة الآن`;
+                btn.disabled = false;
+            }
         };
 
-        // الاستماع الحي لقاعدة البيانات
         function listenToRoom() {
             onSnapshot(doc(db, "rooms", roomId), (docSnap) => {
                 if (docSnap.exists()) {
@@ -208,34 +215,35 @@
                     totalSlots = data.totalSlots;
                     availableSlots = data.availableSlots || [];
                     filledSlots = data.filledSlots || {};
+                    drawnDevices = data.drawnDevices || [];
                     
                     updateUI();
-                } else {
-                    alert("هذه الغرفة غير موجودة!");
                 }
             });
         }
 
-        // تحديث الواجهة بناءً على البيانات القادمة من السيرفر
         function updateUI() {
-            // تحديث أرقام تبويب السحب
             document.getElementById('totalCount').innerText = totalSlots;
             document.getElementById('remainingCount').innerText = availableSlots.length;
 
-            // التحقق مما إذا كان المستخدم قد سحب مسبقاً على هذا الجهاز
             const myStoredSlot = localStorage.getItem(`drawn_${roomId}`);
             const myStoredName = localStorage.getItem(`name_${roomId}`);
 
+            // حماية الواجهة: التحقق من ذاكرة المتصفح أولاً
             if (myStoredSlot) {
                 document.getElementById('drawActionArea').style.display = 'none';
                 document.getElementById('myResult').style.display = 'block';
                 document.getElementById('resName').innerText = myStoredName;
                 document.getElementById('resSlot').innerText = myStoredSlot;
-            } else if (availableSlots.length === 0) {
-                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--text-muted); padding:20px;">اكتمل سحب جميع الخانات للأسف!</p>`;
+            } 
+            // حماية إضافية: إذا تم مسح ذاكرة المتصفح، ولكن بصمة الجهاز مسجلة في السيرفر
+            else if (drawnDevices.includes(myDeviceId)) {
+                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--danger); padding:20px; font-weight:bold;">لقد قمت بالسحب مسبقاً من هذا الجهاز، لا يمكنك السحب مرة أخرى!</p>`;
+            }
+            else if (availableSlots.length === 0) {
+                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--text-muted); padding:20px;">اكتمل سحب جميع الخانات!</p>`;
             }
 
-            // تحديث لوحة الترتيب
             const boardList = document.getElementById('boardList');
             boardList.innerHTML = '';
             
@@ -254,7 +262,6 @@
             }
         }
 
-        // دالة السحب العشوائي للمستخدم
         window.drawMySlot = async function() {
             const nameInput = document.getElementById('playerName');
             const name = nameInput.value.trim();
@@ -262,64 +269,67 @@
 
             if (!name) { alert('يجب كتابة اسمك أولاً!'); return; }
 
-            // التحقق من أن الاسم لم يقم بالسحب مسبقاً (بحث في القيم)
+            // التحقق من أن هذا الجهاز لم يقم بالسحب (حماية السيرفر)
+            if (drawnDevices.includes(myDeviceId)) {
+                alert("تم رصد محاولة سحب متكررة من نفس الجهاز! العملية مرفوضة.");
+                return;
+            }
+
             if (Object.values(filledSlots).includes(name)) {
-                alert('هذا الاسم قام بالسحب بالفعل!'); return;
+                alert('هذا الاسم تم تسجيله بالفعل في الجمعية!'); return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري سحب ورقتك...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري سحب ورقتك السحابية...`;
 
             const roomRef = doc(db, "rooms", roomId);
 
             try {
-                // Transaction لضمان عدم سحب شخصين لنفس الرقم
                 await runTransaction(db, async (transaction) => {
                     const roomDoc = await transaction.get(roomRef);
                     const data = roomDoc.data();
                     let currentAvailable = data.availableSlots || [];
                     let currentFilled = data.filledSlots || {};
+                    let currentDevices = data.drawnDevices || [];
 
                     if (currentAvailable.length === 0) throw "لا توجد خانات فارغة!";
+                    // التحقق النهائي داخل الـ Transaction لمنع أي تلاعب
+                    if (currentDevices.includes(myDeviceId)) throw "لقد قمت بالسحب مسبقاً!";
 
-                    // اختيار رقم عشوائي من المتاح
                     const randomIndex = Math.floor(Math.random() * currentAvailable.length);
                     const selectedSlot = currentAvailable[randomIndex];
 
-                    // إزالة الرقم من المتاح وإضافته للمشغول
                     currentAvailable.splice(randomIndex, 1);
                     currentFilled[selectedSlot] = name;
+                    currentDevices.push(myDeviceId); // تسجيل بصمة الجهاز
 
-                    // رفع التحديث للسيرفر
                     transaction.update(roomRef, {
                         availableSlots: currentAvailable,
-                        filledSlots: currentFilled
+                        filledSlots: currentFilled,
+                        drawnDevices: currentDevices
                     });
 
-                    // حفظ النتيجة محلياً على الجهاز لمنعه من السحب مرة أخرى
                     localStorage.setItem(`drawn_${roomId}`, selectedSlot);
                     localStorage.setItem(`name_${roomId}`, name);
                 });
             } catch (error) {
                 console.error("خطأ:", error);
-                alert("حدث خطأ، يرجى المحاولة مرة أخرى.");
+                alert(typeof error === 'string' ? error : "حدث خطأ، يرجى المحاولة مرة أخرى.");
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fa-solid fa-shuffle"></i> اسحب ورقتي العشوائية`;
             }
         };
 
-        // دوال مساعدة للواجهة
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
         window.copyLink = function() {
             navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ الرابط! أي شخص يفتح الرابط سيدخل لصفحة السحب الخاصة به مباشرة.');
+            alert('تم نسخ الرابط! أرسله للمشتركين ليدخل كل منهم لسحب خانته.');
         }
     </script>
 </body>
