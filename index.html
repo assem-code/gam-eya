@@ -3,197 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة قرعة الجمعيات التفاعلية</title>
+    <title>قرعة الجمعية - سحب فردي</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
+        /* تصميم Noir و Smart */
         :root {
-            --bg-color: #090d16;
-            --card-bg: #131a26;
-            --accent-color: #00e676;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --danger: #ff5252;
-            --warning: #fbbf24;
+            --bg-color: #0b0f19;
+            --card-bg: #151b2b;
+            --accent-color: #00e676; /* أخضر نيون للإشارة للنجاح */
+            --text-main: #f8fafc;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg-color); color: var(--text-main);
+            padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
 
         .app-container {
-            width: 100%;
-            max-width: 650px;
-            background-color: var(--card-bg);
-            border-radius: 20px;
-            padding: 35px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid #1e293b;
+            width: 100%; max-width: 500px; background-color: var(--card-bg);
+            border-radius: 24px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-color);
         }
 
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { font-size: 28px; color: var(--text-main); font-weight: 700; margin-bottom: 5px; }
-        header h1 i { color: var(--accent-color); margin-left: 10px; }
-        header p { color: var(--text-muted); font-size: 14px; }
+        /* شاشة الإنشاء */
+        #createView { text-align: center; }
+        .icon-header { font-size: 50px; color: var(--accent-color); margin-bottom: 20px; }
+        h1 { font-size: 24px; margin-bottom: 10px; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
 
-        /* شاشة البداية */
-        #landingView { display: flex; flex-direction: column; gap: 20px; text-align: center; }
-        .welcome-icon { font-size: 60px; color: var(--accent-color); margin-bottom: 10px; }
-        
-        /* شاشة الغرفة */
-        #appView { display: none; }
-
-        .room-badge {
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            padding: 10px 15px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 14px;
+        input[type="number"], input[type="text"] {
+            width: 100%; background: #0f172a; border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 15px; color: #fff; font-size: 16px; margin-bottom: 20px; text-align: center;
         }
-
-        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
-        input[type="text"] {
-            flex: 1; background-color: #0f172a; border: 1px solid #334155;
-            border-radius: 10px; padding: 12px 15px; color: var(--text-main); font-size: 16px; outline: none;
-        }
-        input[type="text"]:focus { border-color: var(--accent-color); }
+        input:focus { outline: none; border-color: var(--accent-color); }
 
         button {
-            cursor: pointer; border: none; border-radius: 10px; padding: 12px 20px;
-            font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
-            transition: all 0.2s;
+            width: 100%; cursor: pointer; border: none; border-radius: 12px; padding: 16px;
+            font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--accent-color); color: #000; transition: transform 0.2s;
         }
-        button:active { transform: scale(0.98); }
+        button:active { transform: scale(0.97); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .btn-main { background-color: var(--accent-color); color: #000; width: 100%; padding: 15px; font-size: 18px; }
-        .btn-secondary { background-color: #1e293b; color: var(--text-main); border: 1px solid #334155; }
-        .btn-add { background-color: var(--accent-color); color: #000; }
-        .btn-start { background-color: var(--warning); color: #000; width: 100%; padding: 15px; font-size: 18px; margin-top: 15px; }
-        .btn-draw-action { background-color: #6366f1; color: #fff; padding: 8px 15px; font-size: 14px; }
-        .btn-draw-action:hover { background-color: #4f46e5; }
-        .btn-share { background-color: #25d366; color: #fff; width: 100%; margin-top: 15px; }
-        .btn-delete { background: none; color: var(--text-muted); }
-        .btn-delete:hover { color: var(--danger); }
-
-        .section-title { font-size: 16px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .list-container { background-color: #0f172a; border-radius: 12px; max-height: 350px; overflow-y: auto; border: 1px solid #1e293b; }
+        /* شاشة الغرفة والتبويبات */
+        #roomView { display: none; }
         
-        .participant-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px; border-bottom: 1px solid #1e293b; 
+        .tabs { display: flex; background: #0f172a; border-radius: 12px; margin-bottom: 25px; padding: 5px; }
+        .tab-btn {
+            flex: 1; background: transparent; color: var(--text-muted); padding: 12px;
+            border-radius: 8px; font-size: 15px; transition: 0.3s;
         }
-        .participant-name { font-size: 16px; font-weight: 600; }
+        .tab-btn.active { background: var(--card-bg); color: var(--accent-color); font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        /* تصميم قسم السحب */
+        .draw-section { text-align: center; padding: 20px 0; }
+        .slots-info { background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+        .slots-info span { font-size: 20px; font-weight: bold; color: var(--accent-color); }
+
+        .result-card {
+            display: none; background: linear-gradient(145deg, #0f172a, #151b2b);
+            border: 2px solid var(--accent-color); border-radius: 16px; padding: 30px; margin-top: 20px;
+        }
+        .result-card h2 { font-size: 40px; color: var(--accent-color); margin: 10px 0; }
+
+        /* تصميم لوحة الترتيب */
+        .board-list { display: flex; flex-direction: column; gap: 10px; }
+        .board-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #0f172a; border: 1px solid var(--border-color);
+            padding: 15px 20px; border-radius: 12px;
+        }
+        .board-item .slot-num { background: var(--card-bg); color: var(--text-muted); padding: 5px 12px; border-radius: 8px; font-weight: bold; border: 1px solid var(--border-color); }
+        .board-item .slot-name { font-size: 16px; font-weight: 600; }
+        .board-item.filled { border-color: rgba(0, 230, 118, 0.3); }
+        .board-item.filled .slot-num { color: var(--accent-color); border-color: rgba(0, 230, 118, 0.3); }
         
-        .status-badge {
-            background-color: rgba(0, 230, 118, 0.1);
-            color: var(--accent-color);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            border: 1px solid rgba(0, 230, 118, 0.3);
-            animation: popIn 0.3s ease;
-        }
+        .copy-link-btn { background: #1e293b; color: #fff; margin-bottom: 20px; padding: 12px; font-size: 14px;}
 
-        .result-table { width: 100%; border-collapse: collapse; margin-top: 15px;}
-        .result-table th, .result-table td { padding: 12px; text-align: right; }
-        .result-table th { color: var(--accent-color); border-bottom: 2px solid #1e293b; }
-        .result-table td { border-bottom: 1px solid #1e293b; }
-
-        .phase-banner {
-            background: linear-gradient(90deg, #1e293b, #0f172a);
-            padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border-right: 4px solid var(--warning);
-        }
-
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .spinning { animation: spin 1s linear infinite; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="landingView">
-            <i class="fa-solid fa-users-viewfinder welcome-icon"></i>
-            <header>
-                <h1>قرعة الجمعية التفاعلية</h1>
-                <p>كل مشترك يسحب دوره بنفسه لضمان أعلى درجات الشفافية</p>
-            </header>
-            <button class="button btn-main" onclick="createNewRoom()">
-                <i class="fa-solid fa-plus"></i> إنشاء غُرفة جمعية جديدة
+        <div id="createView">
+            <i class="fa-solid fa-layer-group icon-header"></i>
+            <h1>تأسيس جمعية جديدة</h1>
+            <p class="subtitle">حدد عدد الخانات لإنشاء رابط السحب وإرساله للمشتركين</p>
+            
+            <input type="number" id="slotsCount" placeholder="عدد المشتركين (مثال: 10)" min="2" max="50">
+            <button onclick="createRoom()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء الغرفة الآن
             </button>
         </div>
 
-        <div id="appView">
-            <div class="room-badge">
-                <span><i class="fa-solid fa-link" style="color: var(--accent-color); margin-left: 5px;"></i> رابط الغرفة نشط سحابياً</span>
-                <button class="button btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="copyRoomLink()">
-                    <i class="fa-solid fa-copy"></i> نسخ الرابط للجروب
-                </button>
-            </div>
-
-            <header>
-                <h1><i class="fa-solid fa-dice"></i> سحب الأدوار</h1>
-                <p id="roomSubtitle">أضف الأسماء، ثم افتح باب السحب للجميع</p>
-            </header>
-
-            <div id="phaseBanner" class="phase-banner" style="display: none;">
-                <h3 id="phaseTitle" style="color: var(--warning); font-size: 16px;">مرحلة السحب مفتوحة</h3>
-                <p id="phaseDesc" style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">كل شخص يضغط على زر السحب بجوار اسمه للحصول على دوره</p>
-            </div>
-
-            <div class="input-group" id="inputGroup">
-                <input type="text" id="nameInput" placeholder="اكتب اسم المشترك هنا...">
-                <button class="button btn-add" id="addBtn">
-                    <i class="fa-solid fa-plus"></i> إضافة
-                </button>
-            </div>
-
-            <div class="participants-section">
-                <div class="section-title">
-                    <span>قائمة المشتركين</span>
-                    <span id="participantCount">العدد: 0</span>
-                </div>
-                <div class="list-container" id="participantsList"></div>
-            </div>
-
-            <button class="button btn-start" id="startPhaseBtn" style="display: none;">
-                <i class="fa-solid fa-unlock-keyhole"></i> فتح باب السحب للمشتركين
+        <div id="roomView">
+            <button class="copy-link-btn" onclick="copyLink()">
+                <i class="fa-solid fa-link"></i> انسخ الرابط وأرسله للمشتركين
             </button>
 
-            <div id="finalResultsSection" style="display: none;">
-                <table class="result-table">
-                    <thead>
-                        <tr><th>الدور</th><th>اسم المشتـرك</th></tr>
-                    </thead>
-                    <tbody id="finalResultBody"></tbody>
-                </table>
-                <button class="button btn-share" onclick="copyResultsToClipboard()">
-                    <i class="fa-solid fa-copy"></i> نسخ الترتيب النهائي للواتساب
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('drawTab')">
+                    <i class="fa-solid fa-hand-pointer"></i> سحب دوري
                 </button>
+                <button class="tab-btn" onclick="switchTab('boardTab')">
+                    <i class="fa-solid fa-list-ol"></i> لوحة الترتيب
+                </button>
+            </div>
+
+            <div id="drawTab" class="tab-content active draw-section">
+                <div class="slots-info">
+                    الخانات المتبقية: <span id="remainingCount">-</span> من أصل <span id="totalCount">-</span>
+                </div>
+                
+                <div id="drawActionArea">
+                    <input type="text" id="playerName" placeholder="اكتب اسمك الثلاثي هنا...">
+                    <button id="drawBtn" onclick="drawMySlot()">
+                        <i class="fa-solid fa-shuffle"></i> اسحب ورقتي العشوائية
+                    </button>
+                </div>
+
+                <div id="myResult" class="result-card">
+                    <p>مبروك يا <span id="resName"></span>! دورك هو الشهر:</p>
+                    <h2 id="resSlot"></h2>
+                    <p style="color: var(--text-muted); font-size: 12px; margin-top:10px;">تم تسجيل النتيجة وتثبيتها</p>
+                </div>
+            </div>
+
+            <div id="boardTab" class="tab-content">
+                <div class="board-list" id="boardList">
+                    </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // بيانات مشروعك الخاصة التي أرسلتها
+        // بيانات مشروعك (ko3a-d7e0d)
         const firebaseConfig = {
             apiKey: "AIzaSyDjbmmc2fbNZvM_i39GepPojSQIZk4oaI0",
             authDomain: "ko3a-d7e0d.firebaseapp.com",
@@ -210,241 +168,158 @@
         const urlParams = new URLSearchParams(window.location.search);
         let roomId = urlParams.get('room');
         
-        let participants = [];
-        let results = {}; // ستحفظ النتائج بصيغة: { "أحمد": 2, "علي": 1 }
-        let roomStatus = 'gathering'; // gathering | drawing | finished
+        // المتغيرات لحفظ حالة الجمعية
+        let totalSlots = 0;
+        let availableSlots = [];
+        let filledSlots = {}; // { 1: "أحمد", 3: "محمود" }
 
         if (roomId) {
-            document.getElementById('landingView').style.display = 'none';
-            document.getElementById('appView').style.display = 'block';
-            listenToRoom(roomId);
+            document.getElementById('createView').style.display = 'none';
+            document.getElementById('roomView').style.display = 'block';
+            listenToRoom();
         }
 
-        window.createNewRoom = function() {
+        // إنشاء غرفة جديدة
+        window.createRoom = async function() {
+            const count = parseInt(document.getElementById('slotsCount').value);
+            if (!count || count < 2) { alert('أدخل رقماً صحيحاً (أكبر من 1)'); return; }
+
             const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-            window.location.search = `?room=${randomId}`;
-        }
-
-        window.copyRoomLink = function() {
-            navigator.clipboard.writeText(window.location.href);
-            alert('تم نسخ الرابط! أرسله للجروب ليدخل الجميع ويسحبوا أدوارهم.');
-        }
-
-        // الاستماع لتحديثات الغرفة
-        function listenToRoom(id) {
-            const roomRef = doc(db, "rooms", id);
             
-            onSnapshot(roomRef, (docSnap) => {
+            // إنشاء مصفوفة الأرقام [1, 2, 3, ... count]
+            let slotsArray = Array.from({length: count}, (_, i) => i + 1);
+
+            // حفظ الغرفة في فايربيز
+            await setDoc(doc(db, "rooms", randomId), {
+                totalSlots: count,
+                availableSlots: slotsArray,
+                filledSlots: {}
+            });
+
+            // تحويل المستخدم لرابط الغرفة
+            window.location.search = `?room=${randomId}`;
+        };
+
+        // الاستماع الحي لقاعدة البيانات
+        function listenToRoom() {
+            onSnapshot(doc(db, "rooms", roomId), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    participants = data.participants || [];
-                    results = data.results || {};
-                    roomStatus = data.status || 'gathering';
+                    totalSlots = data.totalSlots;
+                    availableSlots = data.availableSlots || [];
+                    filledSlots = data.filledSlots || {};
                     
                     updateUI();
                 } else {
-                    setDoc(roomRef, { participants: [], results: {}, status: 'gathering', availableTurns: [] });
+                    alert("هذه الغرفة غير موجودة!");
                 }
             });
         }
 
+        // تحديث الواجهة بناءً على البيانات القادمة من السيرفر
         function updateUI() {
-            const list = document.getElementById('participantsList');
-            document.getElementById('participantCount').innerText = `العدد: ${participants.length}`;
-            list.innerHTML = '';
+            // تحديث أرقام تبويب السحب
+            document.getElementById('totalCount').innerText = totalSlots;
+            document.getElementById('remainingCount').innerText = availableSlots.length;
 
-            const inputGroup = document.getElementById('inputGroup');
-            const startBtn = document.getElementById('startPhaseBtn');
-            const phaseBanner = document.getElementById('phaseBanner');
-            const finalResultsSection = document.getElementById('finalResultsSection');
-            const subtitle = document.getElementById('roomSubtitle');
+            // التحقق مما إذا كان المستخدم قد سحب مسبقاً على هذا الجهاز
+            const myStoredSlot = localStorage.getItem(`drawn_${roomId}`);
+            const myStoredName = localStorage.getItem(`name_${roomId}`);
 
-            // 1. مرحلة التجميع (إضافة الأسماء)
-            if (roomStatus === 'gathering') {
-                inputGroup.style.display = 'flex';
-                phaseBanner.style.display = 'none';
-                finalResultsSection.style.display = 'none';
-                subtitle.innerText = "أضف الأسماء، ثم افتح باب السحب للجميع";
-
-                if (participants.length >= 2) {
-                    startBtn.style.display = 'block';
-                } else {
-                    startBtn.style.display = 'none';
-                }
-
-                participants.forEach((name, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'participant-item';
-                    item.innerHTML = `
-                        <span class="participant-name">${name}</span>
-                        <button class="btn-delete" onclick="removeParticipant(${index})"><i class="fa-solid fa-trash"></i></button>
-                    `;
-                    list.appendChild(item);
-                });
-            } 
-            
-            // 2. مرحلة السحب (كل شخص يسحب دوره)
-            else if (roomStatus === 'drawing') {
-                inputGroup.style.display = 'none';
-                startBtn.style.display = 'none';
-                phaseBanner.style.display = 'block';
-                finalResultsSection.style.display = 'none';
-                subtitle.innerText = "يرجى من كل مشترك سحب دوره الآن";
-
-                participants.forEach((name) => {
-                    const item = document.createElement('div');
-                    item.className = 'participant-item';
-                    
-                    let actionHtml = '';
-                    if (results[name]) {
-                        // إذا سحب بالفعل
-                        actionHtml = `<div class="status-badge">الشهر ${results[name]}</div>`;
-                    } else {
-                        // إذا لم يسحب بعد (يظهر له الزر)
-                        actionHtml = `<button class="button btn-draw-action" onclick="drawMyTurn('${name}')" id="btn-${name}">
-                                        <i class="fa-solid fa-hand-pointer"></i> اسحب دوري
-                                      </button>`;
-                    }
-
-                    item.innerHTML = `
-                        <span class="participant-name">${name}</span>
-                        ${actionHtml}
-                    `;
-                    list.appendChild(item);
-                });
+            if (myStoredSlot) {
+                document.getElementById('drawActionArea').style.display = 'none';
+                document.getElementById('myResult').style.display = 'block';
+                document.getElementById('resName').innerText = myStoredName;
+                document.getElementById('resSlot').innerText = myStoredSlot;
+            } else if (availableSlots.length === 0) {
+                document.getElementById('drawActionArea').innerHTML = `<p style="color:var(--text-muted); padding:20px;">اكتمل سحب جميع الخانات للأسف!</p>`;
             }
 
-            // 3. مرحلة الانتهاء (تم سحب جميع الأدوار)
-            else if (roomStatus === 'finished') {
-                inputGroup.style.display = 'none';
-                startBtn.style.display = 'none';
-                phaseBanner.style.display = 'none';
-                subtitle.innerText = "اكتمل السحب! إليكم النتيجة النهائية";
+            // تحديث لوحة الترتيب
+            const boardList = document.getElementById('boardList');
+            boardList.innerHTML = '';
+            
+            for (let i = 1; i <= totalSlots; i++) {
+                const item = document.createElement('div');
+                const occupantName = filledSlots[i];
                 
-                // إخفاء القائمة العادية وعرض الجدول المنظم
-                document.querySelector('.participants-section').style.display = 'none';
-                finalResultsSection.style.display = 'block';
-
-                const finalBody = document.getElementById('finalResultBody');
-                finalBody.innerHTML = '';
-                
-                // ترتيب النتائج تصاعدياً حسب الشهر
-                const sortedResults = Object.keys(results).map(key => {
-                    return { name: key, turn: results[key] };
-                }).sort((a, b) => a.turn - b.turn);
-
-                sortedResults.forEach(res => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><div class="status-badge">الشهر ${res.turn}</div></td>
-                        <td><strong>${res.name}</strong></td>
-                    `;
-                    finalBody.appendChild(row);
-                });
+                if (occupantName) {
+                    item.className = 'board-item filled';
+                    item.innerHTML = `<div class="slot-num">${i}</div><div class="slot-name">${occupantName}</div>`;
+                } else {
+                    item.className = 'board-item';
+                    item.innerHTML = `<div class="slot-num">${i}</div><div class="slot-name" style="color: var(--text-muted);">في انتظار السحب...</div>`;
+                }
+                boardList.appendChild(item);
             }
         }
 
-        // إضافة مستخدم
-        document.getElementById('addBtn').onclick = async function() {
-            const input = document.getElementById('nameInput');
-            const name = input.value.trim();
-            if (name === '' || participants.includes(name)) return;
+        // دالة السحب العشوائي للمستخدم
+        window.drawMySlot = async function() {
+            const nameInput = document.getElementById('playerName');
+            const name = nameInput.value.trim();
+            const btn = document.getElementById('drawBtn');
 
-            participants.push(name);
-            input.value = '';
-            await updateDoc(doc(db, "rooms", roomId), { participants: participants });
-            input.focus();
-        };
+            if (!name) { alert('يجب كتابة اسمك أولاً!'); return; }
 
-        // حذف مستخدم (متاح عالمياً)
-        window.removeParticipant = async function(index) {
-            participants.splice(index, 1);
-            await updateDoc(doc(db, "rooms", roomId), { participants: participants });
-        };
-
-        // تحويل الغرفة لوضع السحب وتوليد الأرقام المخفية
-        document.getElementById('startPhaseBtn').onclick = async function() {
-            if (confirm('هل تأكدت من إضافة جميع الأسماء؟ لن تتمكن من إضافة أسماء جديدة بعد فتح باب السحب.')) {
-                // إنشاء مصفوفة بالأرقام المتاحة [1, 2, 3, ...] حسب عدد المشتركين
-                let turns = [];
-                for (let i = 1; i <= participants.length; i++) {
-                    turns.push(i);
-                }
-
-                await updateDoc(doc(db, "rooms", roomId), {
-                    status: 'drawing',
-                    availableTurns: turns,
-                    results: {}
-                });
+            // التحقق من أن الاسم لم يقم بالسحب مسبقاً (بحث في القيم)
+            if (Object.values(filledSlots).includes(name)) {
+                alert('هذا الاسم قام بالسحب بالفعل!'); return;
             }
-        };
 
-        // دالة سحب الدور الخاص بالمستخدم (باستخدام Transaction لمنع التعارض)
-        window.drawMyTurn = async function(name) {
-            if(!confirm(`تأكيد: هل أنت متأكد أنك تريد سحب الدور الخاص بـ ( ${name} )؟`)) return;
-
-            const btn = document.getElementById(`btn-${name}`);
-            btn.innerHTML = `<i class="fa-solid fa-spinner spinning"></i> جاري السحب...`;
             btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري سحب ورقتك...`;
 
             const roomRef = doc(db, "rooms", roomId);
 
             try {
-                // استخدام Transaction لضمان عدم سحب شخصين لنفس الشهر في نفس اللحظة
+                // Transaction لضمان عدم سحب شخصين لنفس الرقم
                 await runTransaction(db, async (transaction) => {
                     const roomDoc = await transaction.get(roomRef);
-                    if (!roomDoc.exists()) throw "الغرفة غير موجودة!";
-                    
                     const data = roomDoc.data();
-                    let currentAvailable = data.availableTurns || [];
-                    let currentResults = data.results || {};
+                    let currentAvailable = data.availableSlots || [];
+                    let currentFilled = data.filledSlots || {};
 
-                    // التأكد أنه لم يسحب مسبقاً وأن هناك أدوار متاحة
-                    if (currentResults[name] || currentAvailable.length === 0) return;
+                    if (currentAvailable.length === 0) throw "لا توجد خانات فارغة!";
 
-                    // اختيار دور عشوائي من الأدوار المتاحة
+                    // اختيار رقم عشوائي من المتاح
                     const randomIndex = Math.floor(Math.random() * currentAvailable.length);
-                    const selectedTurn = currentAvailable[randomIndex];
+                    const selectedSlot = currentAvailable[randomIndex];
 
-                    // إزالة الدور المسحوب من قائمة المتاحين
+                    // إزالة الرقم من المتاح وإضافته للمشغول
                     currentAvailable.splice(randomIndex, 1);
-                    
-                    // تسجيل النتيجة
-                    currentResults[name] = selectedTurn;
-
-                    // التحقق مما إذا كان هذا هو الشخص الأخير
-                    let newStatus = currentAvailable.length === 0 ? 'finished' : 'drawing';
+                    currentFilled[selectedSlot] = name;
 
                     // رفع التحديث للسيرفر
                     transaction.update(roomRef, {
-                        availableTurns: currentAvailable,
-                        results: currentResults,
-                        status: newStatus
+                        availableSlots: currentAvailable,
+                        filledSlots: currentFilled
                     });
+
+                    // حفظ النتيجة محلياً على الجهاز لمنعه من السحب مرة أخرى
+                    localStorage.setItem(`drawn_${roomId}`, selectedSlot);
+                    localStorage.setItem(`name_${roomId}`, name);
                 });
             } catch (error) {
-                console.error("فشل السحب:", error);
-                alert("حدث خطأ أثناء السحب، حاول مرة أخرى.");
-                btn.innerHTML = `<i class="fa-solid fa-hand-pointer"></i> اسحب دوري`;
+                console.error("خطأ:", error);
+                alert("حدث خطأ، يرجى المحاولة مرة أخرى.");
                 btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-shuffle"></i> اسحب ورقتي العشوائية`;
             }
         };
 
-        // نسخ النتيجة النهائية للواتساب
-        window.copyResultsToClipboard = function() {
-            let msg = "📊 *النتيجة النهائية لقرعة الجمعية* 📊\n----------------------------\n";
+        // دوال مساعدة للواجهة
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             
-            const sortedResults = Object.keys(results).map(key => {
-                return { name: key, turn: results[key] };
-            }).sort((a, b) => a.turn - b.turn);
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
 
-            sortedResults.forEach(res => { 
-                msg += `🌙 الشهر [${res.turn}]: ${res.name}\n`; 
-            });
-            msg += "----------------------------\nتم سحب الأدوار فردياً بشفافية تامة 🚀";
-            
-            navigator.clipboard.writeText(msg);
-            alert('تم نسخ الترتيب النهائي! قم بلصقه بجروب الواتساب الآن.');
+        window.copyLink = function() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('تم نسخ الرابط! أي شخص يفتح الرابط سيدخل لصفحة السحب الخاصة به مباشرة.');
         }
     </script>
 </body>
